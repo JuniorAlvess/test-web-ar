@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import './App.css';
 const THREE = require('three');
 function App() {
@@ -53,6 +54,8 @@ function App() {
 
     renderer.render(scene, camera);
     requestAnimationFrame(draw);
+
+    // console.log((window.DeviceOrientationEvent)) 
   }
 
   function showWebcamVideo(sourceId) {
@@ -70,12 +73,16 @@ function App() {
   }
 
   function updateOrientation(e) {
-    var compassdir;
-    if (e.webkitCompassHeading) 
-    compassdir = e.webkitCompassHeading;
-    else compassdir = e.alpha;
+    // var compassdir
+    // console.log("testetstetstetstetstetst")
+    // if (e.webkitCompassHeading) {
+    //   compassdir = e.webkitCompassHeading;
+    //   console.log(e.webkitCompassHeading)
+    // }
 
-    var heading = compassdir,
+    // else compassdir = e.alpha;
+
+    var heading = e.alpha,
       pitch = e.gamma;
 
     // Correcting the sensors being "clever"
@@ -91,11 +98,25 @@ function App() {
       pitch = 90 - pitch;
     }
 
-    if (heading < 0) heading = 360 + heading;
+    if (heading < 0) heading = 360 - heading;
 
     camera.rotation.set(deg2rad(pitch), deg2rad(heading), 0);
     e.preventDefault();
   }
+
+  // function getPermission(){
+  //   if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+  //     DeviceOrientation.Event.requestPermission()
+  //       .then(permissionState => {
+  //         if (permissionState === 'granted') {
+  //           window.addEventListener("deviceorientation", updateOrientation);
+  //         }
+  //       })
+  //       .catch(console.error);
+  //   }else {
+  //     console.log('Blah error')
+  //   }
+  // }
 
   // Initialisiation and run!
 
@@ -169,6 +190,23 @@ function App() {
 
     draw();
   }
+
+  useEffect(() => {
+    // function getPermission() {
+      // if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      //   DeviceOrientation.Event.requestPermission()
+      //     .then(permissionState => {
+      //       if (permissionState === 'granted') {
+      //         window.addEventListener("deviceorientation", updateOrientation);
+      //       }
+      //     })
+      //     .catch(console.error);
+      // }else {
+      //   console.log('Blah error')
+      // }
+    // }
+    // getPermission();
+  }, []);
 
   return (
     <>
