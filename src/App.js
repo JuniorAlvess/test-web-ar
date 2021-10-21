@@ -6,9 +6,6 @@ function App() {
 
   var WIDTH = document.body.clientWidth, HEIGHT = document.body.clientHeight;
 
-  // var lockOrientation = window.screen.orientation.lock || window.screen.lockOrientation
-  //   || window.screen.mozLockOrientation || window.screen.msLockOrientation;
-
   navigator.getMedia = (navigator.getUserMedia ||
     navigator.webkitGetUserMedia ||
     navigator.mozGetUserMedia ||
@@ -27,13 +24,9 @@ function App() {
   var scene = new THREE.Scene(),
     camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000),
     renderer = new THREE.WebGLRenderer({ alpha: true }),
-    light, geometry, north, south, east, west, ctx,
-    canvas = document.getElementById("camera"),
-    video = document.querySelector("video"),
-    btn = document.getElementById("btn");
+    light, geometry, north, south, east, west, ctx;
 
   // Generic definitions functions
-
   function deg2rad(angle) {
     return (angle / 180.0) * Math.PI;
   }
@@ -54,8 +47,6 @@ function App() {
 
     renderer.render(scene, camera);
     requestAnimationFrame(draw);
-
-    // console.log((window.DeviceOrientationEvent)) 
   }
 
   function showWebcamVideo(sourceId) {
@@ -73,15 +64,6 @@ function App() {
   }
 
   function updateOrientation(e) {
-    // var compassdir
-    // console.log("testetstetstetstetstetst")
-    // if (e.webkitCompassHeading) {
-    //   compassdir = e.webkitCompassHeading;
-    //   console.log(e.webkitCompassHeading)
-    // }
-
-    // else compassdir = e.alpha;
-
     var heading = e.alpha,
       pitch = e.gamma;
 
@@ -103,20 +85,6 @@ function App() {
     camera.rotation.set(deg2rad(pitch), deg2rad(heading), 0);
     e.preventDefault();
   }
-
-  // function getPermission(){
-  //   if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-  //     DeviceOrientation.Event.requestPermission()
-  //       .then(permissionState => {
-  //         if (permissionState === 'granted') {
-  //           window.addEventListener("deviceorientation", updateOrientation);
-  //         }
-  //       })
-  //       .catch(console.error);
-  //   }else {
-  //     console.log('Blah error')
-  //   }
-  // }
 
   // Initialisiation and run!
 
