@@ -1,10 +1,14 @@
 import { useEffect } from 'react';
 import './App.css';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+import astronaut from './assets/Astronaut (1).glb'
+
 const THREE = require('three');
 function App() {
   // Generic definitions - variables
 
-  var WIDTH = document.body.clientWidth, HEIGHT = document.body.clientHeight;
+  let width = document.body.clientWidth, height = document.body.clientHeight;
 
   navigator.getMedia = (navigator.getUserMedia ||
     navigator.webkitGetUserMedia ||
@@ -21,10 +25,16 @@ function App() {
     alert("Oh noes! Your browser does not support webcam video :(");
   }
 
-  var scene = new THREE.Scene(),
-    camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000),
-    renderer = new THREE.WebGLRenderer({ alpha: true }),
-    light, geometry, north, south, east, west, ctx;
+  let scene = new THREE.Scene()
+  let camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+  let renderer = new THREE.WebGLRenderer({ alpha: true })
+  let light
+  let geometry
+  let north
+  let south
+  let east
+  let west
+  let ctx
 
   // Generic definitions functions
   function deg2rad(angle) {
@@ -32,39 +42,25 @@ function App() {
   }
 
   function draw() {
-    var width = document.body.clientWidth
-    var height = document.body.clientHeight;
-    var video = document.querySelector("video")
+    let width = document.body.clientWidth
+    let height = document.body.clientHeight;
+    let video = document.querySelector("video")
     ctx.fillStyle = "#ff00ff";
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(video, 0, 0, width, height);
 
-    north.rotation.y += 0.05;
-    south.rotation.y += 0.05;
+    // north.rotation.y += 0.05;
+    // south.rotation.y += 0.05;
 
-    east.rotation.y += 0.05;
-    west.rotation.y += 0.05;
+    // east.rotation.y += 0.05;
+    // west.rotation.y += 0.05;
 
     renderer.render(scene, camera);
     requestAnimationFrame(draw);
   }
 
-  function showWebcamVideo(sourceId) {
-    navigator.getMedia({
-      video: {
-        optional: [{ sourceId: sourceId }]
-      }
-    }, function onSuccess(stream) {
-      var video = document.querySelector('video');
-      video.src = window.URL.createObjectURL(stream);
-    }, function onError(err) {
-      alert("Whoops: " + err);
-      console.error(err);
-    });
-  }
-
   function updateOrientation(e) {
-    var heading = e.alpha,
+    let heading = e.alpha,
       pitch = e.gamma;
 
     // Correcting the sensors being "clever"
@@ -90,58 +86,64 @@ function App() {
 
   camera.eulerOrder = 'YXZ'; // We want to rotate around the Y axis first or our perspective is screwed up
 
-  light = new THREE.PointLight(0xffffff, 1, 100);
+  light = new THREE.PointLight(0xffffff, 5, 100);
   scene.add(light);
 
-  geometry = new THREE.BoxGeometry(10, 10, 10);
-  north = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-  south = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
-  east = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
-  west = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xffff00 }));
+  // geometry = new THREE.BoxGeometry(10, 10, 10);
+  // north = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+  // south = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
+  // east = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+  // west = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xffff00 }));
 
-  north.position.set(0, 0, -50);
-  south.position.set(0, 0, 50);
+  const loader = new GLTFLoader();
 
-  east.position.set(50, 0, 0);
-  west.position.set(-50, 0, 0);
+loader.load(astronaut, (gltf) => {
+  north = (gltf.scene);
+  south = (gltf.scene);
+  east = (gltf.scene);
+  west = (gltf.scene); 
 
+  // north.position.set(-2, -2, -2);
+  north.position.set(0, 0, -5);
+  south.position.set(0, 0, 5);
+
+  east.position.set(5, 0, 0);
+  west.position.set(-5, 0, 0);
   scene.add(north);
   scene.add(east);
   scene.add(south);
   scene.add(west);
+}, undefined, (err) => {
+  console.log(err)
+});
+
+
+  // north.position.set(0, 0, -50);
+  // south.position.set(0, 0, 50);
+
+  // east.position.set(50, 0, 0);
+  // west.position.set(-50, 0, 0);
+
+  // scene.add(north);
+  // scene.add(east);
+  // scene.add(south);
+  // scene.add(west);
 
   window.addEventListener("deviceorientation", updateOrientation);
 
   const handleButton = () => {
-    var canvas = document.getElementById("camera")
+    let canvas = document.getElementById("camera")
     canvas.classList.remove('hidden')
 
     if (document.body.webkitRequestFullscreen) document.body.webkitRequestFullscreen();
     else if (document.body.mozRequestFullScreen) document.body.mozRequestFullScreen();
 
-    // document.body.removeChild(document.getElementById("instructions"));
-
     document.body.appendChild(renderer.domElement);
-    renderer.setSize(WIDTH, HEIGHT);
-
-    // if (window.screen.orientation.lock && !window.screen.orientation.lock('landscape-primary')) {
-    //   alert("Please put your phone in landscape mode for this demo");
-    // } else if (window.screen.lockOrientation && !window.screen.lockOrientation('landscape-primary')) {
-    //   alert("Please put your phone in landscape mode for this demo");
-    // }
-
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
+    renderer.setSize(width, height);
+    canvas.width = width;
+    canvas.height = height;
 
     ctx = canvas.getContext("2d");
-
-    // MediaStreamTrack.getSources(function (mediaSources) {
-    //   mediaSources.forEach(function (mediaSource) {
-    //     if (mediaSource.kind === 'video' && mediaSource.facing == "environment") {
-    //       showWebcamVideo(mediaSource.id);
-    //     }
-    //   });
-    // });
 
     navigator.mediaDevices
       .getUserMedia({ audio: false, video: { facingMode: 'environment' } })
@@ -158,23 +160,6 @@ function App() {
 
     draw();
   }
-
-  useEffect(() => {
-    // function getPermission() {
-      // if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      //   DeviceOrientation.Event.requestPermission()
-      //     .then(permissionState => {
-      //       if (permissionState === 'granted') {
-      //         window.addEventListener("deviceorientation", updateOrientation);
-      //       }
-      //     })
-      //     .catch(console.error);
-      // }else {
-      //   console.log('Blah error')
-      // }
-    // }
-    // getPermission();
-  }, []);
 
   return (
     <>
